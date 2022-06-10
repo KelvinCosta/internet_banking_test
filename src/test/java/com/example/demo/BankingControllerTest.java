@@ -2,14 +2,25 @@ package com.example.demo;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import com.example.demo.utils.JsonUtils;
+
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -20,6 +31,20 @@ public class BankingControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
+	
+	@Autowired
+	private JsonUtils jsonUtils;
+	
+	protected ResultActions save(Object request) throws Exception {
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(BASE_URI + "/save").contentType(MediaType.APPLICATION_JSON)
+				.content(jsonUtils.getRequestJSON(request));
+		return mockMvc.perform(builder.contentType(MediaType.APPLICATION_JSON));
+	}
+	
+	private ResultActions findAll() throws Exception {
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(BASE_URI);
+		return mockMvc.perform(builder.contentType(MediaType.APPLICATION_JSON));
+	}
 
 	@Test
 	void canary() {
@@ -28,12 +53,18 @@ public class BankingControllerTest {
 
 	@Test
 	void testCadastrarCliente() {
-		fail("Not yet implemented");
+		String nome = "Teste da Silva";
+		Boolean planoExclusive = true;
+		Long saldo = 0L;
+		String numeroConta = "CC102938";
+		Date dataNascimento = new Date("25031988");
+		ClienteRequest request = new ClienteRequest(nome, planoExclusive, saldo, numeroConta, dataNascimento);
+		save(request).andExpect(status().isCreated());
 	}
 
 	@Test
-	void testRetornarTodosClientes() {
-		fail("Not yet implemented");
+	void testRetornarTodosClientes() throws Exception {
+		findAll().andExpect(status().isOk());
 	}
 
 	@Test
