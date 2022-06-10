@@ -2,6 +2,7 @@ package com.example.demo;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
@@ -19,13 +20,14 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import com.example.demo.utils.DateUtils;
 import com.example.demo.utils.JsonUtils;
 
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class BankingControllerTest {
+class BankingControllerTest {
 
 	private static final String BASE_URI = "/banking";
 
@@ -45,7 +47,25 @@ public class BankingControllerTest {
 		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(BASE_URI);
 		return mockMvc.perform(builder.contentType(MediaType.APPLICATION_JSON));
 	}
+	
+	private ResultActions update(Object request, String endpoint) throws Exception {
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(BASE_URI + endpoint).contentType(MediaType.APPLICATION_JSON)
+				.content(jsonUtils.getRequestJSON(request));
+		return mockMvc.perform(builder.contentType(MediaType.APPLICATION_JSON));
+	}
+	
+	private ResultActions finder(String endpoint) throws Exception {
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(BASE_URI + endpoint);
+		return mockMvc.perform(builder.contentType(MediaType.APPLICATION_JSON));
+	}
 
+	private String calcularSaldoEsperado(BigDecimal valorSaque, BigDecimal taxaAdministrativa) {
+		BigDecimal saldoInicial = new BigDecimal(1000);
+		BigDecimal valorTaxaAdministrativa = valorSaque.multiply(taxaAdministrativa);
+		BigDecimal saldoEsperado = saldoInicial.subtract(valorSaque).subtract(valorTaxaAdministrativa);
+		return saldoEsperado.toString();
+	}
+	
 	@Test
 	void canary() {
 		assertTrue(true);
@@ -55,46 +75,132 @@ public class BankingControllerTest {
 	void testCadastrarCliente() {
 		String nome = "Teste da Silva";
 		Boolean planoExclusive = true;
-		Long saldo = 0L;
+		BigDecimal saldo = new BigDecimal(0);
 		String numeroConta = "CC102938";
-		Date dataNascimento = new Date("25031988");
+		Date dataNascimento = DateUtils.convertStringToDate("dd/MM/yyyy", "01/01/1988");
 		ClienteRequest request = new ClienteRequest(nome, planoExclusive, saldo, numeroConta, dataNascimento);
-		save(request).andExpect(status().isCreated());
+		
+		try {
+			save(request)
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.nome").value(nome))
+			.andExpect(jsonPath("$.planoExclusive").value(planoExclusive))
+			.andExpect(jsonPath("$.saldo").value(saldo.toString()))
+			.andExpect(jsonPath("$.numeroConta").value(numeroConta))
+			.andExpect(jsonPath("$.dataNascimento").value(dataNascimento.toString()));
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
 	}
 
 	@Test
-	void testRetornarTodosClientes() throws Exception {
-		findAll().andExpect(status().isOk());
+	void testRetornarTodosClientes() {
+		try {
+			findAll().andExpect(status().isOk());
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
 	}
 
 	@Test
 	void testSacarValorMenorQue100() {
-		fail("Not yet implemented");
+		String numeroConta = "CC000001";
+		BigDecimal valorSaque = new BigDecimal(50);
+		String saldoEsperado = calcularSaldoEsperado(valorSaque, new BigDecimal(0));
+		
+		SacarRequest request = new SacarRequest(numeroConta, valorSaque);
+		
+		try {
+			update(request, "/sacar")
+			.andExpect(status().isAccepted())
+			.andExpect(jsonPath("$.numeroConta").value(numeroConta))
+			.andExpect(jsonPath("$.saldo").value(saldoEsperado));
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
 	}
 
 	@Test
 	void testSacarValorEntre100E300() {
-		fail("Not yet implemented");
+		String numeroConta = "CC000002";
+		BigDecimal valorSaque = new BigDecimal(150);
+		String saldoEsperado = calcularSaldoEsperado(valorSaque, new BigDecimal(0.004));
+		
+		SacarRequest request = new SacarRequest(numeroConta, valorSaque);
+		
+		try {
+			update(request, "/sacar")
+			.andExpect(status().isAccepted())
+			.andExpect(jsonPath("$.numeroConta").value(numeroConta))
+			.andExpect(jsonPath("$.saldo").value(saldoEsperado));
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
 	}
 
 	@Test
 	void testSacarValorMaiorQue300() {
-		fail("Not yet implemented");
+		String numeroConta = "CC000003";
+		BigDecimal valorSaque = new BigDecimal(350);
+		String saldoEsperado = calcularSaldoEsperado(valorSaque, new BigDecimal(0.01));
+		
+		SacarRequest request = new SacarRequest(numeroConta, valorSaque);
+		
+		try {
+			update(request, "/sacar")
+			.andExpect(status().isAccepted())
+			.andExpect(jsonPath("$.numeroConta").value(numeroConta))
+			.andExpect(jsonPath("$.saldo").value(saldoEsperado));
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
 	}
 
 	@Test
 	void testSacarValorPlanoExclusive() {
-		fail("Not yet implemented");
+		String numeroConta = "CC000004";
+		
+		SacarRequest request = new SacarRequest("CC000004", new BigDecimal(400));
+		
+		try {
+			update(request, "/sacar")
+			.andExpect(status().isAccepted())
+			.andExpect(jsonPath("$.numeroConta").value(numeroConta))
+			.andExpect(jsonPath("$.saldo").value("650,00"));
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
 	}
 
 	@Test
 	void testDepositar() {
-		fail("Not yet implemented");
+		String numeroConta = "CC000005";
+		BigDecimal valorDeposito = new BigDecimal(100);
+		
+		DepositarRequest request = new DepositarRequest(numeroConta, valorDeposito);
+		
+		try {
+			update(request, "/depositar")
+			.andExpect(status().isAccepted())
+			.andExpect(jsonPath("$.numeroConta").value(numeroConta))
+			.andExpect(jsonPath("$.saldo").value(valorDeposito.toString()));
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
 	}
 
 	@Test
 	void testConsultarHistoricoTransacoes() {
-		fail("Not yet implemented");
+		String numeroConta = "CC000006";
+		
+		try {
+			finder("/historico/" + numeroConta)
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.numeroConta").value(numeroConta))
+			.andExpect(jsonPath("$.historicoTransacoes.length()").value(8));
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
 	}
 
 }
