@@ -3,7 +3,12 @@ package com.example.demo.entity;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +22,12 @@ import com.example.demo.utils.DateUtils;
 @Table(name = "CLIENTE")
 public class Cliente {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CLIENTE_SEQ")
+	@SequenceGenerator(name = "CLIENTE_SEQ", sequenceName = "CLIENTE_SEQ", allocationSize = 1)
+	@Column(name = "ID")
+	private Integer id;
+	
 	private String nome;
 	private Boolean planoExclusive;
 	private BigDecimal saldo;
