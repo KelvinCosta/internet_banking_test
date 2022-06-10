@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -27,6 +30,11 @@ import com.example.demo.utils.JsonUtils;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@SqlGroup({
+	@Sql(scripts = "/sql/delete_database.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD),
+	@Sql(scripts = "/sql/create_database.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD),
+	@Sql(scripts = "/sql/insert_data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+})
 class BankingControllerTest {
 
 	private static final String BASE_URI = "/banking";
@@ -44,7 +52,7 @@ class BankingControllerTest {
 	}
 
 	private ResultActions findAll() throws Exception {
-		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(BASE_URI);
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(BASE_URI + "/clientes");
 		return mockMvc.perform(builder.contentType(MediaType.APPLICATION_JSON));
 	}
 
@@ -90,7 +98,20 @@ class BankingControllerTest {
 	@Test
 	void testRetornarTodosClientes() {
 		try {
-			findAll().andExpect(status().isOk());
+			findAll()
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$[0].numeroConta").value("CC000001"))
+			.andExpect(jsonPath("$[0].nome").value("TESTE 1"))
+			.andExpect(jsonPath("$[1].numeroConta").value("CC000002"))
+			.andExpect(jsonPath("$[1].nome").value("TESTE 2"))
+			.andExpect(jsonPath("$[2].numeroConta").value("CC000003"))
+			.andExpect(jsonPath("$[2].nome").value("TESTE 3"))
+			.andExpect(jsonPath("$[3].numeroConta").value("CC000004"))
+			.andExpect(jsonPath("$[3].nome").value("TESTE 4"))
+			.andExpect(jsonPath("$[4].numeroConta").value("CC000005"))
+			.andExpect(jsonPath("$[4].nome").value("TESTE 5"))
+			.andExpect(jsonPath("$[5].numeroConta").value("CC000006"))
+			.andExpect(jsonPath("$[5].nome").value("TESTE 6"));
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}

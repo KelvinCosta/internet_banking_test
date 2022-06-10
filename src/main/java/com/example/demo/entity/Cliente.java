@@ -40,6 +40,9 @@ public class Cliente {
 		}
 	}
 	
+	public Cliente() {
+	}
+
 	public Cliente(ClienteRequest request)  {
 		validador(request.getNome(), "Nome");
 		this.nome = request.getNome();

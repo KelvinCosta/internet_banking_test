@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,10 @@ public class BankingService {
 
 	public Cliente save(ClienteRequest request) {
 		return clienteRepository.save(request.toEntity());
+	}
+
+	public List<Cliente> findAll() {
+		return clienteRepository.findAll();
 	}
 
 }
