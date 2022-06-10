@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.request;
 
 import java.math.BigDecimal;
 import java.util.Date;
