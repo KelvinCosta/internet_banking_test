@@ -1,18 +1,15 @@
 package com.example.demo.request;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 public class ClienteRequest {
 
 	private String nome;
-	private Boolean planoExclusive;
-	private BigDecimal saldo;
+	private String planoExclusive;
+	private String saldo;
 	private String numeroConta;
-	private Date dataNascimento;
+	private String dataNascimento;
 
-	public ClienteRequest(String nome, Boolean planoExclusive, BigDecimal saldo, String numeroConta,
-			Date dataNascimento) {
+	public ClienteRequest(String nome, String planoExclusive, String saldo, String numeroConta,
+			String dataNascimento) {
 		this.nome = nome;
 		this.planoExclusive = planoExclusive;
 		this.saldo = saldo;
@@ -24,11 +21,11 @@ public class ClienteRequest {
 		return this.nome;
 	}
 
-	public Boolean getPlanoExclusive() {
+	public String getPlanoExclusive() {
 		return this.planoExclusive;
 	}
 
-	public BigDecimal getSaldo() {
+	public String getSaldo() {
 		return this.saldo;
 	}
 
@@ -36,7 +33,7 @@ public class ClienteRequest {
 		return this.numeroConta;
 	}
 
-	public Date getDataNascimento() {
+	public String getDataNascimento() {
 		return this.dataNascimento;
 	}
 
