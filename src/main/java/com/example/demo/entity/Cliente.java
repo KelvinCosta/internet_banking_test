@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 
 import com.example.demo.exception.ClienteException;
 import com.example.demo.request.ClienteRequest;
+import com.example.demo.response.ClienteResponse;
 import com.example.demo.utils.DateUtils;
 
 @Entity
@@ -64,6 +65,10 @@ public class Cliente {
 
 	public Date getDataNascimento() {
 		return dataNascimento;
+	}
+
+	public ClienteResponse toResponse() {
+		return new ClienteResponse(this);
 	}
 	
 }

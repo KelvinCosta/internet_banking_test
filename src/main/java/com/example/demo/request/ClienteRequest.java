@@ -1,5 +1,7 @@
 package com.example.demo.request;
 
+import com.example.demo.entity.Cliente;
+
 public class ClienteRequest {
 
 	private String nome;
@@ -35,6 +37,10 @@ public class ClienteRequest {
 
 	public String getDataNascimento() {
 		return this.dataNascimento;
+	}
+
+	public Cliente toEntity() {
+		return new Cliente(this);
 	}
 
 }
