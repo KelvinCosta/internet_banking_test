@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +22,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.example.demo.request.ClienteRequest;
 import com.example.demo.request.DepositarRequest;
 import com.example.demo.request.SacarRequest;
-import com.example.demo.utils.DateUtils;
 import com.example.demo.utils.JsonUtils;
 
 @ExtendWith(SpringExtension.class)
@@ -70,10 +68,10 @@ class BankingControllerTest {
 	@Test
 	void testCadastrarCliente() {
 		String nome = "Teste da Silva";
-		Boolean planoExclusive = true;
-		BigDecimal saldo = new BigDecimal(0);
+		String planoExclusive = "true";
+		String saldo = "0,00";
 		String numeroConta = "CC102938";
-		Date dataNascimento = DateUtils.convertStringToDate("dd/MM/yyyy", "01/01/1988");
+		String dataNascimento = "01/01/1988";
 		ClienteRequest request = new ClienteRequest(nome, planoExclusive, saldo, numeroConta, dataNascimento);
 
 		try {
