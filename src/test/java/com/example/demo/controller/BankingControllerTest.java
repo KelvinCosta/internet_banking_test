@@ -69,17 +69,19 @@ class BankingControllerTest {
 	void testCadastrarCliente() {
 		String nome = "Teste da Silva";
 		String planoExclusive = "true";
-		String saldo = "0,00";
+		String saldo = "0.00";
 		String numeroConta = "CC102938";
 		String dataNascimento = "01/01/1988";
 		ClienteRequest request = new ClienteRequest(nome, planoExclusive, saldo, numeroConta, dataNascimento);
 
 		try {
-			post(request, "/cadastrarCliente").andExpect(status().isCreated()).andExpect(jsonPath("$.nome").value(nome))
-					.andExpect(jsonPath("$.planoExclusive").value(planoExclusive))
-					.andExpect(jsonPath("$.saldo").value(saldo.toString()))
-					.andExpect(jsonPath("$.numeroConta").value(numeroConta))
-					.andExpect(jsonPath("$.dataNascimento").value(dataNascimento.toString()));
+			post(request, "/cadastrarCliente")
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.nome").value(nome))
+			.andExpect(jsonPath("$.planoExclusive").value(planoExclusive))
+			.andExpect(jsonPath("$.saldo").value(saldo.toString()))
+			.andExpect(jsonPath("$.numeroConta").value(numeroConta))
+			.andExpect(jsonPath("$.dataNascimento").value(dataNascimento.toString()));
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
