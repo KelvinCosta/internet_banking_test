@@ -2,11 +2,13 @@ package com.example.demo.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,10 +16,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.entity.Cliente;
+import com.example.demo.entity.Transacao;
 import com.example.demo.request.ClienteRequest;
 import com.example.demo.request.MovimentarContaRequest;
 import com.example.demo.response.ClienteResponse;
 import com.example.demo.response.ErrorResponseDTO;
+import com.example.demo.response.TransacaoResponse;
 import com.example.demo.service.BankingService;
 
 import io.swagger.annotations.Api;
@@ -68,4 +72,16 @@ public class BankingController {
 		return new ResponseEntity<ClienteResponse>(cliente.toResponse(), HttpStatus.ACCEPTED);
 	}
 
+	@ApiOperation(value = "Listar historico de transacao do cliente")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Transacoes encontradas"),
+			@ApiResponse(code = 400, message = "Erro na requisicao", response = ErrorResponseDTO.class),
+			@ApiResponse(code = 500, message = "Erro no servico", response = ErrorResponseDTO.class) })
+	@GetMapping("/historico/{numeroConta}")
+	@ResponseBody
+	public ResponseEntity<List<TransacaoResponse>> historicoTransacoes(@PathVariable String numeroConta) {
+		Set<Transacao> transacoes = service.buscarHistoricoTransacoes(numeroConta);
+		List<TransacaoResponse> response = new ArrayList<>();
+		transacoes.forEach(transacao -> response.add(transacao.toResponse()));
+		return new ResponseEntity<List<TransacaoResponse>>(response, HttpStatus.OK);
+	}
 }
