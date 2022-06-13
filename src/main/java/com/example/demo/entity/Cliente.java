@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -60,6 +61,25 @@ public class Cliente {
 		this.dataNascimento = DateUtils.convertStringToDate("dd/MM/yyyy", request.getDataNascimento());
 		
 	}
+	
+	/**
+	 * 
+	 * @param cliente
+	 * @param novoSaldo
+	 * @return new cliente object with changed saldo value
+	 */
+	public Cliente(Cliente cliente, BigDecimal novoSaldo) {
+		this.id = cliente.getId();
+		this.nome = cliente.getNome();
+		this.planoExclusive = cliente.getPlanoExclusive();
+		this.saldo = novoSaldo;
+		this.numeroConta = cliente.getNumeroConta();
+		this.dataNascimento = cliente.getDataNascimento();
+	}
+	
+	public Integer getId() {
+		return id;
+	}
 
 	public String getNome() {
 		return nome;
@@ -70,7 +90,7 @@ public class Cliente {
 	}
 
 	public BigDecimal getSaldo() {
-		return saldo;
+		return saldo.setScale(2, RoundingMode.CEILING);
 	}
 
 	public String getNumeroConta() {
