@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +24,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.example.demo.request.ClienteRequest;
-import com.example.demo.request.DepositarRequest;
-import com.example.demo.request.SacarRequest;
+import com.example.demo.request.MovimentarContaRequest;
 import com.example.demo.utils.JsonUtils;
 
 @ExtendWith(SpringExtension.class)
@@ -65,7 +65,7 @@ class BankingControllerTest {
 		BigDecimal saldoInicial = new BigDecimal(1000);
 		BigDecimal valorTaxaAdministrativa = valorSaque.multiply(taxaAdministrativa);
 		BigDecimal saldoEsperado = saldoInicial.subtract(valorSaque).subtract(valorTaxaAdministrativa);
-		return saldoEsperado.toString();
+		return saldoEsperado.setScale(2, RoundingMode.CEILING).toString();
 	}
 
 	@Test
@@ -123,7 +123,7 @@ class BankingControllerTest {
 		BigDecimal valorSaque = new BigDecimal(50);
 		String saldoEsperado = calcularSaldoEsperado(valorSaque, new BigDecimal(0));
 
-		SacarRequest request = new SacarRequest(numeroConta, valorSaque);
+		MovimentarContaRequest request = new MovimentarContaRequest(numeroConta, valorSaque, true);
 
 		try {
 			post(request, "/sacar").andExpect(status().isAccepted())
@@ -140,7 +140,7 @@ class BankingControllerTest {
 		BigDecimal valorSaque = new BigDecimal(150);
 		String saldoEsperado = calcularSaldoEsperado(valorSaque, new BigDecimal(0.004));
 
-		SacarRequest request = new SacarRequest(numeroConta, valorSaque);
+		MovimentarContaRequest request = new MovimentarContaRequest(numeroConta, valorSaque, true);
 
 		try {
 			post(request, "/sacar").andExpect(status().isAccepted())
@@ -157,7 +157,7 @@ class BankingControllerTest {
 		BigDecimal valorSaque = new BigDecimal(350);
 		String saldoEsperado = calcularSaldoEsperado(valorSaque, new BigDecimal(0.01));
 
-		SacarRequest request = new SacarRequest(numeroConta, valorSaque);
+		MovimentarContaRequest request = new MovimentarContaRequest(numeroConta, valorSaque, true);
 
 		try {
 			post(request, "/sacar").andExpect(status().isAccepted())
@@ -171,13 +171,14 @@ class BankingControllerTest {
 	@Test
 	void testSacarValorPlanoExclusive() {
 		String numeroConta = "CC000004";
+		BigDecimal valorSaque = new BigDecimal(400);
 
-		SacarRequest request = new SacarRequest("CC000004", new BigDecimal(400));
+		MovimentarContaRequest request = new MovimentarContaRequest("CC000004", valorSaque, true);
 
 		try {
 			post(request, "/sacar").andExpect(status().isAccepted())
 					.andExpect(jsonPath("$.numeroConta").value(numeroConta))
-					.andExpect(jsonPath("$.saldo").value("650,00"));
+					.andExpect(jsonPath("$.saldo").value("600.00"));
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
@@ -188,7 +189,7 @@ class BankingControllerTest {
 		String numeroConta = "CC000005";
 		BigDecimal valorDeposito = new BigDecimal(100);
 
-		DepositarRequest request = new DepositarRequest(numeroConta, valorDeposito);
+		MovimentarContaRequest request = new MovimentarContaRequest(numeroConta, valorDeposito, false);
 
 		try {
 			post(request, "/depositar").andExpect(status().isAccepted())
