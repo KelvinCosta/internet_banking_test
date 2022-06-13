@@ -126,7 +126,7 @@ class BankingControllerTest {
 		MovimentarContaRequest request = new MovimentarContaRequest(numeroConta, valorSaque, true);
 
 		try {
-			post(request, "/sacar").andExpect(status().isAccepted())
+			post(request, "/movimentar").andExpect(status().isAccepted())
 					.andExpect(jsonPath("$.numeroConta").value(numeroConta))
 					.andExpect(jsonPath("$.saldo").value(saldoEsperado));
 		} catch (Exception e) {
@@ -143,7 +143,7 @@ class BankingControllerTest {
 		MovimentarContaRequest request = new MovimentarContaRequest(numeroConta, valorSaque, true);
 
 		try {
-			post(request, "/sacar").andExpect(status().isAccepted())
+			post(request, "/movimentar").andExpect(status().isAccepted())
 					.andExpect(jsonPath("$.numeroConta").value(numeroConta))
 					.andExpect(jsonPath("$.saldo").value(saldoEsperado));
 		} catch (Exception e) {
@@ -160,7 +160,7 @@ class BankingControllerTest {
 		MovimentarContaRequest request = new MovimentarContaRequest(numeroConta, valorSaque, true);
 
 		try {
-			post(request, "/sacar").andExpect(status().isAccepted())
+			post(request, "/movimentar").andExpect(status().isAccepted())
 					.andExpect(jsonPath("$.numeroConta").value(numeroConta))
 					.andExpect(jsonPath("$.saldo").value(saldoEsperado));
 		} catch (Exception e) {
@@ -176,7 +176,7 @@ class BankingControllerTest {
 		MovimentarContaRequest request = new MovimentarContaRequest("CC000004", valorSaque, true);
 
 		try {
-			post(request, "/sacar").andExpect(status().isAccepted())
+			post(request, "/movimentar").andExpect(status().isAccepted())
 					.andExpect(jsonPath("$.numeroConta").value(numeroConta))
 					.andExpect(jsonPath("$.saldo").value("600.00"));
 		} catch (Exception e) {
@@ -192,9 +192,9 @@ class BankingControllerTest {
 		MovimentarContaRequest request = new MovimentarContaRequest(numeroConta, valorDeposito, false);
 
 		try {
-			post(request, "/depositar").andExpect(status().isAccepted())
+			post(request, "/movimentar").andExpect(status().isAccepted())
 					.andExpect(jsonPath("$.numeroConta").value(numeroConta))
-					.andExpect(jsonPath("$.saldo").value(valorDeposito.toString()));
+					.andExpect(jsonPath("$.saldo").value(valorDeposito.setScale(2, RoundingMode.CEILING).toString()));
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}

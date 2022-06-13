@@ -61,10 +61,11 @@ public class BankingController {
 	@ApiResponses(value = { @ApiResponse(code = 202, message = "Novo Cliente Cadastrado"),
 			@ApiResponse(code = 400, message = "Erro na requisicao", response = ErrorResponseDTO.class),
 			@ApiResponse(code = 500, message = "Erro no servico", response = ErrorResponseDTO.class) })
-	@PostMapping("/sacar")
+	@PostMapping("/movimentar")
 	@ResponseBody
 	public ResponseEntity<ClienteResponse> sacarValorConta(@RequestBody MovimentarContaRequest request) {
 		Cliente cliente = service.sacarValorConta(request);
 		return new ResponseEntity<ClienteResponse>(cliente.toResponse(), HttpStatus.ACCEPTED);
 	}
+
 }
