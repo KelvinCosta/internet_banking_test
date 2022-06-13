@@ -206,8 +206,7 @@ class BankingControllerTest {
 
 		try {
 			finder("/historico/" + numeroConta).andExpect(status().isOk())
-					.andExpect(jsonPath("$.numeroConta").value(numeroConta))
-					.andExpect(jsonPath("$.historicoTransacoes.length()").value(8));
+					.andExpect(jsonPath("$.length()").value(8));
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
