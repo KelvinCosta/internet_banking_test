@@ -64,7 +64,7 @@ public class BankingController {
 	@PostMapping("/movimentar")
 	@ResponseBody
 	public ResponseEntity<ClienteResponse> sacarValorConta(@RequestBody MovimentarContaRequest request) {
-		Cliente cliente = service.sacarValorConta(request);
+		Cliente cliente = service.movimentarConta(request);
 		return new ResponseEntity<ClienteResponse>(cliente.toResponse(), HttpStatus.ACCEPTED);
 	}
 

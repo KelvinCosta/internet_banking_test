@@ -28,15 +28,32 @@ public class BankingService {
 		return clienteRepository.findAll();
 	}
 
-	public Cliente sacarValorConta(MovimentarContaRequest request) {
+	public Cliente movimentarConta(MovimentarContaRequest request) {
 		try {
 			Cliente cliente = clienteRepository.findByNumeroConta(request.getNumeroConta()).get();
-			BigDecimal novoSaldo = request.getSaqueDeposito() ? cliente.getSaldo().subtract(request.getValor()) : cliente.getSaldo().add(request.getValor());
+			BigDecimal taxaAdministrativa = request.getSaqueDeposito() && !cliente.getPlanoExclusive()
+					? calcularTaxaAdministrativa(request.getValor())
+					: new BigDecimal(0);
+			BigDecimal novoSaldo = request.getSaqueDeposito()
+					? cliente.getSaldo().subtract(request.getValor().add(taxaAdministrativa))
+					: cliente.getSaldo().add(request.getValor());
 			Cliente clienteNovoSaldo = new Cliente(cliente, novoSaldo);
 			return clienteRepository.save(clienteNovoSaldo);
 		} catch (NoSuchElementException ex) {
-			throw new SacarException(HttpStatus.NO_CONTENT, "Numero conta: " + request.getNumeroConta() + " nao encontrado");
+			throw new SacarException(HttpStatus.NO_CONTENT,
+					"Numero conta: " + request.getNumeroConta() + " nao encontrado");
 		}
+	}
+
+	private BigDecimal calcularTaxaAdministrativa(BigDecimal valor) {
+		BigDecimal min = new BigDecimal(100);
+		BigDecimal max = new BigDecimal(300);
+
+		if (valor.compareTo(min) > 0 && valor.compareTo(max) <= 0)
+			return valor.multiply(new BigDecimal(0.004));
+		if (valor.compareTo(max) > 0)
+			return valor.multiply(new BigDecimal(0.01));
+		return new BigDecimal(0);
 	}
 
 }
