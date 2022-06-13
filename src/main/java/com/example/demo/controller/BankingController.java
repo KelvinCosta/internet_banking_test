@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.entity.Cliente;
 import com.example.demo.request.ClienteRequest;
+import com.example.demo.request.MovimentarContaRequest;
 import com.example.demo.response.ClienteResponse;
 import com.example.demo.response.ErrorResponseDTO;
 import com.example.demo.service.BankingService;
@@ -28,36 +29,42 @@ import io.swagger.annotations.ApiResponses;
 @RestController
 @RequestMapping("/banking")
 public class BankingController {
-	
+
 	@Autowired
-	BankingService service; 
-	
+	BankingService service;
+
 	@ApiOperation(value = "Cadastro de cliente")
-	@ApiResponses(value = {
-			@ApiResponse(code = 202, message = "Novo Cliente Cadastrado"),
+	@ApiResponses(value = { @ApiResponse(code = 202, message = "Novo Cliente Cadastrado"),
 			@ApiResponse(code = 400, message = "Erro na requisicao", response = ErrorResponseDTO.class),
-			@ApiResponse(code = 500, message = "Erro no servico", response = ErrorResponseDTO.class)
-	})
+			@ApiResponse(code = 500, message = "Erro no servico", response = ErrorResponseDTO.class) })
 	@PostMapping("/cadastrarCliente")
 	@ResponseBody
-	public ResponseEntity<ClienteResponse> cadastrarCliente(@RequestBody ClienteRequest request){
+	public ResponseEntity<ClienteResponse> cadastrarCliente(@RequestBody ClienteRequest request) {
 		Cliente cliente = service.save(request);
 		return new ResponseEntity<ClienteResponse>(cliente.toResponse(), HttpStatus.CREATED);
 	}
-	
+
 	@ApiOperation(value = "Listar todos os clientes")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Clientes encontrados"),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Clientes encontrados"),
 			@ApiResponse(code = 400, message = "Erro na requisicao", response = ErrorResponseDTO.class),
-			@ApiResponse(code = 500, message = "Erro no servico", response = ErrorResponseDTO.class)
-	})
+			@ApiResponse(code = 500, message = "Erro no servico", response = ErrorResponseDTO.class) })
 	@GetMapping("/clientes")
 	@ResponseBody
-	public ResponseEntity<List<ClienteResponse>> listarClientes(){
+	public ResponseEntity<List<ClienteResponse>> listarClientes() {
 		List<Cliente> clientes = service.findAll();
 		List<ClienteResponse> response = new ArrayList<>();
 		clientes.forEach(cliente -> response.add(cliente.toResponse()));
 		return new ResponseEntity<List<ClienteResponse>>(response, HttpStatus.OK);
 	}
-	
+
+	@ApiOperation(value = "Sacar valor da conta")
+	@ApiResponses(value = { @ApiResponse(code = 202, message = "Novo Cliente Cadastrado"),
+			@ApiResponse(code = 400, message = "Erro na requisicao", response = ErrorResponseDTO.class),
+			@ApiResponse(code = 500, message = "Erro no servico", response = ErrorResponseDTO.class) })
+	@PostMapping("/sacar")
+	@ResponseBody
+	public ResponseEntity<ClienteResponse> sacarValorConta(@RequestBody MovimentarContaRequest request) {
+		Cliente cliente = service.sacarValorConta(request);
+		return new ResponseEntity<ClienteResponse>(cliente.toResponse(), HttpStatus.ACCEPTED);
+	}
 }
