@@ -16,9 +16,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.springframework.http.HttpStatus;
-
-import com.example.demo.exception.ClienteException;
+import com.example.demo.exception.BankingException;
 import com.example.demo.request.ClienteRequest;
 import com.example.demo.response.ClienteResponse;
 import com.example.demo.utils.DateUtils;
@@ -44,7 +42,7 @@ public class Cliente {
 
 	private void validador(String str, String field) {
 		if (str.isBlank()) {
-			throw new ClienteException(HttpStatus.BAD_REQUEST, field + " invalido");
+			throw new BankingException("Cliente", field, ".vazio", " nao pode ser vazio");
 		}
 	}
 
