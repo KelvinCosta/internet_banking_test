@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.util.NestedServletException;
 
 import com.example.demo.request.ClienteRequest;
 import com.example.demo.request.MovimentarContaRequest;
@@ -210,6 +212,19 @@ class BankingControllerTest {
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
+	}
+	
+	@Test
+	void testClienteNaoEncontradoHistorico() {
+		String numeroConta = "CC000111";
+		Exception exception = assertThrows(NestedServletException.class, () -> {
+			finder("/historico/" + numeroConta);
+	    });
+
+	    String expectedMessage = "cliente.numeroconta.naoencontrado";
+	    String actualMessage = exception.getMessage();
+
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 }
